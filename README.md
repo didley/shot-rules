@@ -192,6 +192,72 @@ null_ls.setup({
 })
 ```
 
+## Runtime utils
+
+`shot-rules` ships a companion utility module for the globals its rules ban. Import from `shot-rules/utils`:
+
+```ts
+import { tryCatch, tryCatchAsync, jsonParse, jsonStringify, safeFetch } from "shot-rules/utils"
+```
+
+Every function returns `[value, null] | [null, Error]` — never throws.
+
+### `tryCatch<T>(fn: () => T): Result<T>`
+
+Wraps any synchronous call that might throw. Use this for third-party library calls.
+
+```ts
+const [data, err] = tryCatch(() => someLib.parse(input))
+if (err !== null) { return [null, err] }
+```
+
+### `tryCatchAsync<T>(fn: () => Promise<T>): Promise<Result<T>>`
+
+Same for async calls.
+
+```ts
+const [user, err] = await tryCatchAsync(() => db.findUser(id))
+if (err !== null) { return [null, err] }
+```
+
+### `jsonParse<T>(text: string): Result<T>`
+
+Safe replacement for the banned `JSON.parse`.
+
+```ts
+const [data, err] = jsonParse<Config>(rawText)
+if (err !== null) { return [null, new Error(`invalid config: ${err.message}`)] }
+```
+
+### `jsonStringify(value: unknown, indent?: number | null): Result<string>`
+
+Safe replacement for the banned `JSON.stringify`.
+
+```ts
+const [json, err] = jsonStringify(payload)
+if (err !== null) { return [null, err] }
+```
+
+### `safeFetch(url: string | URL, init?: RequestInit | null): Promise<Result<Response>>`
+
+Safe replacement for the banned `fetch`. Network errors surface as `Error`. HTTP error status codes are not automatically errors — check `res.ok` yourself.
+
+```ts
+const [res, fetchErr] = await safeFetch(`https://api.example.com/users/${id}`)
+if (fetchErr !== null) { return [null, fetchErr] }
+if (!res.ok) { return [null, new Error(`HTTP ${res.status.toString()}`)] }
+const [data, parseErr] = jsonParse<User>(await res.text())
+if (parseErr !== null) { return [null, parseErr] }
+```
+
+### `Result<T>` type
+
+```ts
+type Result<T> = [T, null] | [null, Error]
+```
+
+Re-export this from your own codebase to type all your fallible functions consistently.
+
 ## What's not included
 
 Two rules from ShotScript are intentionally omitted from `shot-rules` as they are Shot-ecosystem specific:

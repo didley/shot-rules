@@ -10,6 +10,16 @@
   "bin": {
     "shot-rules": "./dist/cli.js"
   },
+  "exports": {
+    ".": {
+      "import": "./dist/checker/mod.js",
+      "types": "./dist/checker/mod.d.ts"
+    },
+    "./utils": {
+      "import": "./dist/utils/index.js",
+      "types": "./dist/utils/index.d.ts"
+    }
+  },
   "main": "./dist/checker/mod.js",
   "types": "./dist/checker/mod.d.ts",
   "files": [
@@ -18,7 +28,7 @@
   ],
   "scripts": {
     "build": "tsc",
-    "test": "node --import tsx/esm tests/runner.ts",
+    "test": "node --import tsx/esm tests/runner.ts && node --import tsx/esm --test tests/utils.test.ts",
     "check": "tsc --noEmit"
   },
   "dependencies": {
