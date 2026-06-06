@@ -110,3 +110,27 @@ export async function safeFetch(url: string | URL, init: RequestInit | null = nu
         return [null, new Error(`fetch failed: ${String(e)}`)]
     }
 }
+
+/**
+ * Adds context to a propagated error — the shot-lint equivalent of Go's fmt.Errorf("context: %w", err).
+ * Sets err.cause (ES2022) so the original error remains inspectable.
+ *
+ *   const [data, err] = jsonParse<Config>(text)
+ *   if (err !== null) { return [null, wrapError(`loadConfig: ${path}`, err)] }
+ */
+export function wrapError(message: string, cause: Error): Error {
+    const err = new Error(message)
+    err.cause = cause
+    return err
+}
+
+/**
+ * Returns a single-slot mutable cell — the canonical way to hold mutable state
+ * when no-let-outside-for bans let in function bodies and module scope.
+ *
+ *   const count = mutableRef(0)
+ *   count.value += 1
+ */
+export function mutableRef<T>(initial: T): { value: T } {
+    return { value: initial }
+}
