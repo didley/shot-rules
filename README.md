@@ -78,6 +78,19 @@ type User = { readonly id: number; readonly avatar: string | null; readonly dele
 function findUser(id: number): [User | null, Error | null] { ... }
 ```
 
+**No complex types — types are shapes, not programs**
+```ts
+// ❌ before — type-level programs that require knowing advanced TS to read
+type Flatten<T> = T extends Array<infer U> ? U : T
+type Merged = UserBase & UserProfile & { readonly role: string }
+type ReadonlyRecord<K extends string, V> = { readonly [P in K]: V }
+
+// ✅ after — types are plain shapes; readable at a glance
+type FlatItem = string | number
+type User = { readonly id: number; readonly name: string; readonly role: string }
+type Config = { readonly [key: string]: string }
+```
+
 **Immutable by default**
 ```ts
 // ❌ before — any function can mutate these; nothing in the type stops it
