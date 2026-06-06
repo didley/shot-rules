@@ -1,6 +1,6 @@
 # shot — Agent Context
 
-You are writing TypeScript that follows the **shot discipline**. This file is authoritative. Follow it exactly. When in doubt, the explicit, verbose, named form always wins.
+You are writing TypeScript that follows the **shot lint**. This file is authoritative. Follow it exactly. When in doubt, the explicit, verbose, named form always wins.
 
 ---
 

@@ -5,7 +5,7 @@
  ╚════██║██╔══██║██║   ██║   ██║
  ███████║██║  ██║╚██████╔╝   ██║
  ╚══════╝╚═╝  ╚═╝ ╚═════╝    ╚═╝
- discipline — Go-style TypeScript. One way to do everything.
+ lint — TypeScript. One way to do everything.
 ```
 
 TypeScript has four ways to write a function, three ways to handle errors, and two ways to declare a type — and most codebases use all of them. shot picks one of each and bans the rest.
@@ -134,7 +134,7 @@ if (el === null) { return [null, new Error('missing #app')] }
 | Type complexity | `no-conditional-type` `no-mapped-type` `no-infer` `no-intersection-types` |
 | Control flow | `no-ternary` `no-do-while` `no-for-in` `switch-no-fallthrough` |
 | Operators | `no-bitwise` `no-eval` `no-generators` `no-comma-operator` |
-| Discipline | `no-shadow` `no-param-reassign` `no-multi-var-decl` |
+| Lint | `no-shadow` `no-param-reassign` `no-multi-var-decl` |
 | Hygiene | `no-empty` `no-loop-func` `no-self-compare` `prefer-template` |
 | Globals | `no-throwing-globals` — bans `JSON.parse`, `JSON.stringify`, `fetch` |
 | Imports | `no-require` `no-default-export` `no-index-import` |
@@ -189,9 +189,9 @@ Working projects in [`examples/`](./examples/):
 
 ```mermaid
 graph TD
-    SL["**ShotLint**  ·  github.com/didley/shot-lint\n──────────────────────────────────\nGo-style linting for any TypeScript project\n• 90+ AST rules · standalone CLI · npm · jsr\n• No Deno required\n• Runtime utils — jsonParse, safeFetch, tryCatch"]
+    SL["**ShotLint**  ·  github.com/didley/shot-lint\n──────────────────────────────────\nStrict linting for any TypeScript project\n• 90+ AST rules · standalone CLI · npm · jsr\n• No Deno required\n• Runtime utils — jsonParse, safeFetch, tryCatch"]
 
-    SS["**ShotScript**  ·  github.com/didley/ShotScript\n──────────────────────────────────\nThe full opinionated Go-style toolchain\n• .shot files · shot CLI · Deno runtime\n• shot:std standard library · import allowlist\n• Locked tsconfig — no user overrides"]
+    SS["**ShotScript**  ·  github.com/didley/ShotScript\n──────────────────────────────────\nThe full opinionated lint toolchain\n• .shot files · shot CLI · Deno runtime\n• shot:std standard library · import allowlist\n• Locked tsconfig — no user overrides"]
 
     TS["**Your TypeScript project**\n(any runtime · any framework)"]
 
@@ -208,7 +208,7 @@ graph TD
     style REG stroke-dasharray: 5 5
 ```
 
-**shot-lint** — discipline on your terms, in your project.  
+**shot-lint** — lint on your terms, in your project.  
 **[shot](https://github.com/didley/EspressoScript)** — the full opinionated toolchain built on top of it.
 
 ## Development
