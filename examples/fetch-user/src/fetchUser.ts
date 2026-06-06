@@ -1,5 +1,5 @@
 import { safeFetch, jsonParse } from "shot-lint/utils"
-import type { ShotPromise } from "shot-lint/utils"
+import type { PromiseResult } from "shot-lint/utils"
 
 type User = {
     readonly id: number
@@ -7,7 +7,7 @@ type User = {
     readonly email: string
 }
 
-export async function fetchUser(id: number): ShotPromise<User> {
+export async function fetchUser(id: number): PromiseResult<User> {
     const url = `https://jsonplaceholder.typicode.com/users/${id.toString()}`
     const [res, fetchErr] = await safeFetch(url)
     if (fetchErr !== null) {

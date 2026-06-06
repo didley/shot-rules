@@ -7,6 +7,7 @@ import { noUnaryPlus } from "./no-unary-plus.js"
 import { noThrow } from "./no-throw.js"
 import { noTry } from "./no-try.js"
 import { noPromiseChain } from "./no-promise-chain.js"
+import { noPromise } from "./no-promise.js"
 import { noLooseEquality } from "./no-loose-equality.js"
 import { noAndShorthand } from "./no-and-shorthand.js"
 import { noDoubleBang } from "./no-double-bang.js"
@@ -102,6 +103,7 @@ export const rules: Rule[] = [
     noThrow,
     noTry,
     noPromiseChain,
+    noPromise,
     noLooseEquality,
     noAndShorthand,
     noDoubleBang,

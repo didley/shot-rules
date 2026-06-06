@@ -136,7 +136,7 @@ if (el === null) { return [null, new Error('missing #app')] }
 |---|---|
 | Functions | `no-arrow-functions` `require-named-functions` `require-explicit-return-type` |
 | Variables | `no-var` `no-let-outside-for` `no-increment-decrement` |
-| Error handling | `no-throw` `no-try` `no-promise-chain` `require-tuple-destructure` |
+| Error handling | `no-throw` `no-try` `no-promise` `no-promise-chain` `require-tuple-destructure` |
 | Types | `no-any` `no-assertion` `no-non-null` `no-ts-comment` `no-interface` `no-enum` |
 | Immutability | `require-readonly-property` `require-readonly-arrays` |
 | Type shape | `no-optional-property` `no-optional-parameter` `no-undefined-type` |
@@ -163,11 +163,11 @@ Ships a `tsconfig/shot-lint.json` with everything above `strict: true` — `noUn
 The rules ban `JSON.parse`, `JSON.stringify`, and `fetch` because they throw. `shot-lint/utils` provides the safe replacements — all return `[value, null] | [null, Error]`.
 
 ```ts
-import { tryCatch, tryCatchAsync, jsonParse, jsonStringify, safeFetch } from "shot-lint/utils"
+import { toResult, toPromiseResult, jsonParse, jsonStringify, safeFetch } from "shot-lint/utils"
 
-// third-party calls that might throw
-const [val, err] = tryCatch(() => someLib.parse(input))
-const [val, err] = await tryCatchAsync(() => db.query(sql))
+// third-party calls that might throw or reject
+const [val, err] = toResult(() => someLib.parse(input))
+const [val, err] = await toPromiseResult(() => db.query(sql))
 
 // banned globals → safe wrappers
 const [data, err]  = jsonParse<Config>(text)
@@ -175,13 +175,19 @@ const [json, err]  = jsonStringify(payload)
 const [res, err]   = await safeFetch("https://api.example.com/users/1")
 ```
 
-`Result<T>` is exported too — use it to type your own fallible functions:
+`Result<T>` and `PromiseResult<T>` are exported for typing your own fallible functions:
 ```ts
-import type { Result } from "shot-lint/utils"
+import type { Result, PromiseResult } from "shot-lint/utils"
 
 function divide(a: number, b: number): Result<number> {
     if (b === 0) { return [null, new Error("division by zero")] }
     return [a / b, null]
+}
+
+async function fetchUser(id: number): PromiseResult<User> {
+    const [res, err] = await safeFetch(`/users/${id.toString()}`)
+    if (err !== null) { return [null, err] }
+    return jsonParse<User>(await res.text())
 }
 ```
 
@@ -199,7 +205,7 @@ Working projects in [`examples/`](./examples/):
 
 ```mermaid
 graph TD
-    SL["**ShotLint**  ·  github.com/didley/shot-lint\n──────────────────────────────────\nStrict linting for any TypeScript project\n• 90+ AST rules · standalone CLI · npm · jsr\n• No Deno required\n• Runtime utils — jsonParse, safeFetch, tryCatch"]
+    SL["**ShotLint**  ·  github.com/didley/shot-lint\n──────────────────────────────────\nStrict linting for any TypeScript project\n• 90+ AST rules · standalone CLI · npm · jsr\n• No Deno required\n• Runtime utils — jsonParse, safeFetch, toResult, toPromiseResult"]
 
     SS["**ShotScript**  ·  github.com/didley/ShotScript\n──────────────────────────────────\nThe full opinionated lint toolchain\n• .shot files · Shot CLI · Deno runtime\n• shot:std standard library · import allowlist\n• Locked tsconfig — no user overrides"]
 

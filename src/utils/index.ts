@@ -6,18 +6,20 @@
  * the no-throwing-globals rule.
  *
  * Usage:
- *   import { tryCatch, tryCatchAsync, jsonParse, jsonStringify, safeFetch } from "shot-lint/utils"
+ *   import { toResult, toPromiseResult, jsonParse, jsonStringify, safeFetch } from "shot-lint/utils"
  */
 
-export type Result<T> = [T, null] | [null, Error]
+export type Result<T, E extends Error = Error> = [T, null] | [null, E]
+
+export type PromiseResult<T, E extends Error = Error> = Promise<Result<T, E>>
 
 /**
  * Wraps any synchronous call that might throw.
  * Use for third-party library calls that shot-lint can't detect.
  *
- *   const [value, err] = tryCatch(() => someLib.parse(input))
+ *   const [value, err] = toResult(() => someLib.parse(input))
  */
-export function tryCatch<T>(fn: () => T): Result<T> {
+export function toResult<T>(fn: () => T): Result<T> {
     try {
         return [fn(), null]
     } catch (e) {
@@ -30,11 +32,11 @@ export function tryCatch<T>(fn: () => T): Result<T> {
 
 /**
  * Wraps any async call that might reject.
- * Use for third-party async functions that shot-lint can't detect.
+ * Use for third-party async functions that return a plain Promise.
  *
- *   const [value, err] = await tryCatchAsync(() => someLib.fetchData(id))
+ *   const [value, err] = await toPromiseResult(() => someLib.fetchData(id))
  */
-export async function tryCatchAsync<T>(fn: () => Promise<T>): Promise<Result<T>> {
+export async function toPromiseResult<T>(fn: () => Promise<T>): PromiseResult<T> {
     try {
         return [await fn(), null]
     } catch (e) {
@@ -88,7 +90,7 @@ export function jsonStringify(value: unknown, indent: number | null = null): Res
  *   if (err !== null) { return [null, err] }
  *   if (!res.ok) { return [null, new Error(`HTTP ${res.status.toString()}`)] }
  */
-export async function safeFetch(url: string | URL, init: RequestInit | null = null): Promise<Result<Response>> {
+export async function safeFetch(url: string | URL, init: RequestInit | null = null): PromiseResult<Response> {
     try {
         const res = await fetch(url, init ?? undefined)
         return [res, null]
