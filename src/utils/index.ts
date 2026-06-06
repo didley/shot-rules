@@ -11,6 +11,16 @@
 
 export type Result<T, E extends Error = Error> = [T, null] | [null, E]
 
+/**
+ * A Promise that resolves to a Result tuple — the async equivalent of Result<T, E>.
+ * Use as the return type of any async function that can fail.
+ *
+ *   async function fetchUser(id: number): PromiseResult<User> {
+ *     const [res, err] = await safeFetch(`/users/${id}`)
+ *     if (err !== null) { return [null, err] }
+ *     return jsonParse<User>(await res.text())
+ *   }
+ */
 export type PromiseResult<T, E extends Error = Error> = Promise<Result<T, E>>
 
 /**
