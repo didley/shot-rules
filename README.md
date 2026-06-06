@@ -177,10 +177,6 @@ Linting and formatting are separate concerns — shot-lint owns the rules, your 
 ```
 Biome's linter is disabled in the exported config — shot-lint handles linting.
 
-**EditorConfig** (universal, applies before any formatter)
-
-Copy `node_modules/shot-lint/editorconfig/shot-lint.editorconfig` to your project root as `.editorconfig`.
-
 ---
 
 ## Strict tsconfig
