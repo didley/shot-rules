@@ -1,6 +1,6 @@
 {
   "name": "shot-lint",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Go-style TypeScript. One way to do everything — rules, safe utils, and agent context in one package.",
   "type": "module",
   "license": "MIT",
