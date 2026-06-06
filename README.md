@@ -25,7 +25,7 @@ This Package:
 | | |
 |---|---|
 | **Rules** | 90+ AST rules enforced via CLI and TypeScript editor plugin — no ESLint, no Biome lock-in |
-| **Formatting** | Shareable configs for Biome, Prettier, and dprint — no semicolons, single quotes, 4-space indent |
+| **Formatting** | Shareable Biome config — no semicolons, single quotes, 4-space indent |
 | **Utils** | Safe replacements for every banned global (`jsonParse`, `safeFetch`, `tryCatch`, …) |
 | **`AGENTS.md`** | Drop-in context file so AI coding assistants generate compliant code from the start |
 
@@ -176,16 +176,6 @@ Linting and formatting are separate concerns — shot-lint owns the rules, your 
 { "extends": ["shot-lint/biome"] }
 ```
 Biome's linter is disabled in the exported config — shot-lint handles linting.
-
-**Prettier**
-```js
-// prettier.config.js
-export { default } from 'shot-lint/prettier'
-```
-
-**dprint** (used by `shot fmt` / `deno fmt` internally — most faithful to ShotScript)
-
-Copy `node_modules/shot-lint/dprint/dprint.json` to your project root and update the plugin URL to the current dprint TypeScript plugin version.
 
 **EditorConfig** (universal, applies before any formatter)
 

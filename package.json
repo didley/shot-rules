@@ -22,9 +22,7 @@
     },
     "./plugin": "./dist/plugin.cjs",
     "./tsconfig/shot-lint.json": "./tsconfig/shot-lint.json",
-    "./biome": "./biome/biome.json",
-    "./prettier": "./prettier/prettier.config.js",
-    "./dprint": "./dprint/dprint.json"
+    "./biome": "./biome/biome.json"
   },
   "main": "./dist/checker/mod.js",
   "types": "./dist/checker/mod.d.ts",
@@ -32,8 +30,6 @@
     "dist/",
     "tsconfig/",
     "biome/",
-    "prettier/",
-    "dprint/",
     "editorconfig/"
   ],
   "scripts": {
