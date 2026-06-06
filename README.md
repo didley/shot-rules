@@ -24,7 +24,7 @@ This Package:
 
 | | |
 |---|---|
-| **Rules** | 90+ AST rules enforced via CLI and TypeScript editor plugin — no ESLint, no Biome lock-in |
+| **Rules** | 90+ AST rules enforced via TypeScript plugin — surfaces as `tsc` errors in CI and editor squiggles locally, no ESLint, no Biome lock-in |
 | **Formatting** | Shareable Biome config — no semicolons, single quotes, 4-space indent |
 | **Utils** | Safe replacements for every banned global (`jsonParse`, `safeFetch`, `tryCatch`, …) |
 | **`AGENTS.md`** | Drop-in context file so AI coding assistants generate compliant code from the start |
@@ -35,31 +35,20 @@ This Package:
 
 **npm** · [npmjs.com/package/shot-lint](https://www.npmjs.com/package/shot-lint)
 ```sh
-npx shot-lint 'src/**/*.ts'          # one-off, no install
-npm install --save-dev shot-lint     # per-project
+npm install --save-dev shot-lint
 ```
 
-Add to `package.json`:
+Add the plugin and extend the strict tsconfig in `tsconfig.json`:
 ```json
-{ "scripts": { "lint": "shot-lint 'src/**/*.ts'" } }
+{
+    "extends": "shot-lint/tsconfig/shot-lint.json",
+    "compilerOptions": {
+        "plugins": [{ "name": "shot-lint/plugin" }]
+    }
+}
 ```
 
-Extend the strict tsconfig:
-```json
-{ "extends": "shot-lint/tsconfig/shot-lint.json" }
-```
-
----
-
-```sh
-npx shot-lint 'src/**/*.ts'
-
-src/auth.ts:12:5:  [no-arrow-functions]        Arrow functions are not allowed.
-src/auth.ts:34:3:  [no-throw]                  throw is not allowed — return [null, error] instead.
-src/types.ts:8:5:  [require-readonly-property]  Object type properties must be readonly.
-
-3 violations found.
-```
+Violations surface as `tsc` errors — caught in CI automatically and as red squiggles in any editor that uses tsserver.
 
 ## What changes
 
@@ -148,20 +137,7 @@ if (el === null) { return [null, new Error('missing #app')] }
 
 Full rationale and before/after examples for every rule: [`docs/LANGUAGE.md`](https://github.com/didley/ShotScript/blob/main/docs/LANGUAGE.md).
 
-Flags: `--json` for machine-readable output. Exit `0` = clean, `1` = violations.
-
-## Editor plugin
-
-The TypeScript language service plugin surfaces shot-lint violations as editor diagnostics — red squiggles in VSCode and any editor that uses tsserver — without running a separate lint script.
-
-Add to your `tsconfig.json`:
-```json
-{ "compilerOptions": { "plugins": [{ "name": "shot-lint/plugin" }] } }
-```
-
 > **VSCode**: open the command palette → _TypeScript: Select TypeScript Version_ → _Use Workspace Version_. Without this, VSCode uses its bundled TypeScript which won't load the plugin.
-
-The CLI remains available for CI (`shot-lint 'src/**/*.ts'`). The plugin and CLI use the same rules.
 
 ---
 
@@ -246,7 +222,7 @@ In `deno.json`:
 ```json
 { "lint": { "exclude": ["**/*"] } }
 ```
-Or simply don't run `deno lint` — use `shot-lint` or the TypeScript plugin instead.
+Or simply don't run `deno lint` — the TypeScript plugin covers it.
 
 ---
 

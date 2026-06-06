@@ -8,10 +8,7 @@
     "type": "git",
     "url": "https://github.com/didley/shot-lint"
   },
-  "bin": {
-    "shot-lint": "./dist/cli.js"
-  },
-  "exports": {
+"exports": {
     ".": {
       "import": "./dist/checker/mod.js",
       "types": "./dist/checker/mod.d.ts"
