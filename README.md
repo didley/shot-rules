@@ -1,14 +1,20 @@
 ```
  ███████╗██╗  ██╗ ██████╗ ████████╗
  ██╔════╝██║  ██║██╔═══██╗╚══██╔══╝
- ███████╗███████║██║   ██║   ██║
- ╚════██║██╔══██║██║   ██║   ██║
- ███████║██║  ██║╚██████╔╝   ██║
- ╚══════╝╚═╝  ╚═╝ ╚═════╝    ╚═╝
- lint — TypeScript, one way.
+ ███████╗███████║██║   ██║   ██║   
+ ╚════██║██╔══██║██║   ██║   ██║   
+ ███████║██║  ██║╚██████╔╝   ██║   
+ ╚══════╝╚═╝  ╚═╝ ╚═════╝    ╚═╝   
+ TypeScript, one way.
+
+ Shot extracts features from TypeScript, applying Go's "one canonical way" philosophy to the TS/JS ecosystem.
+ Making coding easier for humans and LLMs.
 ```
 
-Four ways to write a function. Three ways to handle errors. Two ways to declare a type. Shot picks one of each and bans the rest.
+Echosystem:
+**[ShotScript](https://github.com/didley/ShotScript)** — Opinionated toolchain strictly enforcing Shots principles.
+**[ShotLint](https://github.com/didley/ShotLint)** — Utils and config for typing, linting, and formatting with Shots principles.
+
 
 Three things in one package:
 
@@ -207,9 +213,6 @@ graph TD
 
     style REG stroke-dasharray: 5 5
 ```
-
-**ShotLint** — lint on your terms, in your project.  
-**[ShotScript](https://github.com/didley/ShotScript)** — the full opinionated toolchain built on top of it.
 
 ## Development
 
