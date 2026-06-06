@@ -53,11 +53,5 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Lint hello-world example
-        run: node dist/cli.js 'examples/hello-world/src/**/*.ts'
-
-      - name: Lint fetch-user example
-        run: node dist/cli.js 'examples/fetch-user/src/**/*.ts'
-
-      - name: Lint calculator example
-        run: node dist/cli.js 'examples/calculator/src/**/*.ts'
+      - name: Check examples
+        run: node scripts/check-examples.mjs

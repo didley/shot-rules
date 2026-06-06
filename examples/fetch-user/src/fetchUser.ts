@@ -29,4 +29,4 @@ async function main(): Promise<void> {
     console.log(`email: ${user.email}`)
 }
 
-main()
+void main()
