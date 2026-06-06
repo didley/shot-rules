@@ -2,9 +2,9 @@
 
 This file is the coding style guide for **ShotLint** (`shot-lint` npm package). You are writing TypeScript that follows the shot lint rules. This file is authoritative. Follow it exactly. When in doubt, the explicit, verbose, named form always wins.
 
-**ShotLint** is the npm package for existing TypeScript projects — it enforces Shot principles via a TypeScript language-server plugin, a shareable Biome config, and safe util wrappers. It does not require Deno, a `.shot` file extension, or a new CLI.
+**ShotLint** is the npm package for existing TypeScript projects — it enforces Shot principles via a TypeScript language-server plugin, a shareable Biome config, and safe util wrappers. It does not require Bun, a `.shot` file extension, or a new CLI.
 
-**ShotScript** is the separate full toolchain (different repo) for new projects that use `.shot` files, the `shot` CLI, Deno runtime, and `shot:std` stdlib. If you are in the ShotScript repo, refer to that repo's `AGENTS.md` instead.
+**ShotScript** is the separate full toolchain (different repo) for new projects that use `.shot` files, the `shot` CLI, Bun runtime, and `shot:std` stdlib. If you are in the ShotScript repo, refer to that repo's `AGENTS.md` instead.
 
 ---
 

@@ -14,7 +14,7 @@ Making coding easier for humans and LLMs.
 
 Echosystem:
 
-**[ShotScript](https://github.com/didley/ShotScript)** — Full opinionated toolchain: `.shot` file extension, `shot` CLI, Deno runtime, `shot:std` stdlib, and import allowlist. Start new projects with `shot init` — no config, no overrides.
+**[ShotScript](https://github.com/didley/ShotScript)** — Full opinionated toolchain: `.shot` file extension, `shot` CLI, Bun runtime, `shot:std` stdlib, and import allowlist. Start new projects with `shot init` — no config, no overrides.
 
 **[ShotLint](https://github.com/didley/ShotLint)** — Bring Shot principles to existing TypeScript projects: 90+ lint rules as `tsc` errors via TypeScript plugin, shareable Biome config, and safe util wrappers. No new extension or runtime required.
 
@@ -121,7 +121,7 @@ if (el === null) { return [null, new Error('missing #app')] }
 |---|---|
 | Functions | `no-arrow-functions` `require-named-functions` `require-explicit-return-type` |
 | Variables | `no-var` `no-let-outside-for` `no-increment-decrement` |
-| Error handling | `no-throw` `no-try` `no-promise` `no-promise-chain` `require-tuple-destructure` |
+| Error handling | `no-throw` `no-try` `no-promise` `no-promise-chain` `no-floating-promises` `require-tuple-destructure` |
 | Types | `no-any` `no-assertion` `no-non-null` `no-ts-comment` `no-interface` `no-enum` |
 | Immutability | `require-readonly-property` `require-readonly-arrays` |
 | Type shape | `no-optional-property` `no-optional-parameter` `no-undefined-type` |
@@ -204,7 +204,7 @@ Working projects in [`examples/`](./examples/):
 
 ## Replacing existing tools
 
-shot-lint replaces ESLint entirely, and replaces the linter portion of Biome or Deno's built-in lint. Keep whichever formatter you prefer.
+shot-lint replaces ESLint entirely, and replaces the linter portion of Biome. Keep whichever formatter you prefer.
 
 **Replacing ESLint**
 ```sh
@@ -216,13 +216,6 @@ rm -f eslint.config.js .eslintrc.js .eslintrc.json .eslintignore
 
 In `biome.json`, set `"linter": { "enabled": false }` — or extend `shot-lint/biome` which sets this automatically.
 
-**Disabling Deno's built-in linter**
-
-In `deno.json`:
-```json
-{ "lint": { "exclude": ["**/*"] } }
-```
-Or simply don't run `deno lint` — the TypeScript plugin covers it.
 
 ---
 
