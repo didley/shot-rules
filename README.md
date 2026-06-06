@@ -1,294 +1,178 @@
-# shot-rules
-
-Go-style discipline for TypeScript. One canonical way to write every construct — the same philosophy that makes Go codebases easy to read applies just as well to TypeScript.
-
-90+ AST rules enforced by a standalone CLI. No framework dependency. No runtime lock-in. Drop it into any TypeScript project.
-
 ```
-shot-rules 'src/**/*.ts'
+ ███████╗██╗  ██╗ ██████╗ ████████╗
+ ██╔════╝██║  ██║██╔═══██╗╚══██╔══╝
+ ███████╗███████║██║   ██║   ██║
+ ╚════██║██╔══██║██║   ██║   ██║
+ ███████║██║  ██║╚██████╔╝   ██║
+ ╚══════╝╚═╝  ╚═╝ ╚═════╝    ╚═╝
+ rules — Go-style discipline for any TypeScript project.
+```
 
-src/auth.ts:12:5: [no-arrow-functions] Arrow functions are not allowed.
-src/auth.ts:34:3: [no-throw] throw statements are not allowed — return [null, error] instead.
-src/types.ts:8:5: [require-readonly-property] Object type properties must be readonly.
+TypeScript has four ways to write a function, three ways to handle errors, and two ways to declare a type — and most codebases use all of them. `shot-rules` picks one of each and bans the rest.
+
+90+ AST rules. Standalone CLI. Works with any runtime, any framework, no framework at all.
+
+```sh
+npx shot-rules 'src/**/*.ts'
+
+src/auth.ts:12:5:  [no-arrow-functions]        Arrow functions are not allowed.
+src/auth.ts:34:3:  [no-throw]                  throw is not allowed — return [null, error] instead.
+src/types.ts:8:5:  [require-readonly-property]  Object type properties must be readonly.
 
 3 violations found.
 ```
 
-## What it enforces
+## What changes
 
-90+ rules across every layer of TypeScript — functions, types, error handling, immutability, control flow, and code hygiene:
+**One way to write a function**
+```ts
+// ❌ before
+const double = (n: number) => n * 2
+[1,2,3].map(x => x * 2)
 
-| Category | Rules |
-|---|---|
-| Functions | `no-arrow-functions`, `require-named-functions`, `require-explicit-return-type` |
-| Variables | `no-var`, `no-let-outside-for`, `no-increment-decrement`, `no-unary-plus` |
-| Error handling | `no-throw`, `no-try`, `no-promise-chain`, `require-tuple-destructure`, `require-async-tuple-return` |
-| Types | `no-any`, `no-assertion`, `no-non-null`, `no-ts-comment`, `no-interface`, `no-enum`, `no-undefined-type` |
-| Immutability | `require-readonly-property`, `require-readonly-arrays`, `no-readonly-wrapper` |
-| Type safety | `no-optional-property`, `no-optional-parameter`, `no-default-parameter`, `no-empty-object-type`, `no-object-type`, `no-function-type` |
-| OOP/meta | `no-class`, `no-abstract`, `no-decorators`, `no-this`, `no-metaprogramming-globals` |
-| Type complexity | `no-conditional-type`, `no-mapped-type`, `no-template-literal-type`, `no-infer`, `no-intersection-types` |
-| Control flow | `no-ternary`, `no-do-while`, `no-for-in`, `no-labels`, `switch-no-fallthrough` |
-| Operators | `no-bitwise`, `no-delete`, `no-in`, `no-comma-operator`, `no-eval`, `no-generators` |
-| Discipline | `no-shadow`, `no-multi-var-decl`, `no-param-reassign`, `no-multi-assign`, `no-return-assign` |
-| Hygiene | `no-empty`, `no-lone-blocks`, `no-loop-func`, `no-self-compare`, `prefer-template` |
-| Globals | `no-throwing-globals` (`JSON.parse`, `JSON.stringify`, `fetch` throw — wrap them) |
-| Imports | `no-require`, `no-default-export`, `no-index-import` |
-| Canonical forms | `no-array-generic`, `no-banned-utility-types`, `no-primitive-wrapper-types`, `no-index-signature` |
-
-See [ShotScript's language docs](https://github.com/didley/EspressoScript/blob/main/docs/LANGUAGE.md) for the rationale behind each rule with before/after examples.
-
-## Ecosystem
-
-shot-rules is a standalone project. It is also the rule engine powering [shot](https://github.com/didley/EspressoScript) — a complete Go-style TypeScript language and toolchain built on top of it.
-
-```mermaid
-graph TD
-    SR["shot-rules\n────────────────\n• 90+ AST rules\n• Runtime utils\n• npm package\n• Any TS project"]
-
-    SS["shot\n────────────────\n• .shot file extension\n• Deno runtime\n• shot:std library\n• shot CLI\n• Import allowlist\n• Locked tsconfig"]
-
-    PROJ["Your TypeScript project\n(any runtime, any framework)"]
-
-    SR -->|"embedded as\ngit submodule"| SS
-    SS -->|"calls checker\nfor .shot files"| SR
-    SR -->|"npx shot-rules\nor install globally"| PROJ
+// ✅ after
+function double(n: number): number { return n * 2 }
+[1,2,3].map(function double(n: number): number { return n * 2 })
 ```
 
-Use **shot-rules** when you want the discipline applied to your own project on your own terms. Use **shot** when you want the full opinionated toolchain — fixed runtime, locked imports, `shot:std`, and zero configurability.
+**Errors in the type signature, not the air**
+```ts
+// ❌ before
+async function getUser(id: number): Promise<User> {
+    const res = await fetch(`/users/${id}`)
+    return res.json() as User  // throws, casts, lies
+}
+
+// ✅ after
+async function getUser(id: number): Promise<[User | null, Error | null]> {
+    const [res, fetchErr] = await safeFetch(`/users/${id}`)
+    if (fetchErr !== null) { return [null, fetchErr] }
+    return jsonParse<User>(await res.text())
+}
+```
+
+**Types that mean what they say**
+```ts
+// ❌ before
+type Config = { host: string; port?: number }
+function load(input: any): Config { return input as Config }
+
+// ✅ after
+type Config = { readonly host: string; readonly port: number | null }
+function load(input: unknown): [Config | null, Error | null] { ... }
+```
+
+## Rules
+
+| Category | Highlights |
+|---|---|
+| Functions | `no-arrow-functions` `require-named-functions` `require-explicit-return-type` |
+| Variables | `no-var` `no-let-outside-for` `no-increment-decrement` |
+| Error handling | `no-throw` `no-try` `no-promise-chain` `require-tuple-destructure` |
+| Types | `no-any` `no-assertion` `no-non-null` `no-ts-comment` `no-interface` `no-enum` |
+| Immutability | `require-readonly-property` `require-readonly-arrays` |
+| Type shape | `no-optional-property` `no-optional-parameter` `no-undefined-type` |
+| OOP / meta | `no-class` `no-abstract` `no-decorators` `no-this` `no-metaprogramming-globals` |
+| Type complexity | `no-conditional-type` `no-mapped-type` `no-infer` `no-intersection-types` |
+| Control flow | `no-ternary` `no-do-while` `no-for-in` `switch-no-fallthrough` |
+| Operators | `no-bitwise` `no-eval` `no-generators` `no-comma-operator` |
+| Discipline | `no-shadow` `no-param-reassign` `no-multi-var-decl` |
+| Hygiene | `no-empty` `no-loop-func` `no-self-compare` `prefer-template` |
+| Globals | `no-throwing-globals` — bans `JSON.parse`, `JSON.stringify`, `fetch` |
+| Imports | `no-require` `no-default-export` `no-index-import` |
+| Canonical forms | `no-array-generic` `no-banned-utility-types` `no-primitive-wrapper-types` |
+
+Full rationale and before/after examples for every rule: [`docs/LANGUAGE.md`](https://github.com/didley/EspressoScript/blob/main/docs/LANGUAGE.md).
 
 ## Install
 
-**Global (run anywhere):**
 ```sh
-npm install -g shot-rules
-shot-rules 'src/**/*.ts'
-```
+# one-off
+npx shot-rules 'src/**/*.ts'
 
-**Per-project:**
-```sh
+# per-project
 npm install --save-dev shot-rules
-npx shot-rules 'src/**/*.ts'
+
+# global
+npm install -g shot-rules
 ```
 
-**One-off (no install):**
-```sh
-npx shot-rules 'src/**/*.ts'
-```
-
-## Usage
-
-```sh
-# Check all TypeScript files under src/
-shot-rules 'src/**/*.ts'
-
-# Check specific files
-shot-rules src/index.ts src/lib.ts
-
-# JSON output (for editor integration or CI tooling)
-shot-rules --json 'src/**/*.ts'
-```
-
-Exit code `0` means no violations. Exit code `1` means violations were found or an error occurred.
-
-### JSON output format
-
+Add to `package.json`:
 ```json
-[
-  {
-    "file": "src/auth.ts",
-    "line": 12,
-    "col": 5,
-    "rule": "no-arrow-functions",
-    "message": "Arrow functions are not allowed."
-  }
-]
+{ "scripts": { "lint": "shot-rules 'src/**/*.ts'" } }
 ```
+
+Flags: `--json` for machine-readable output. Exit `0` = clean, `1` = violations.
 
 ## Strict tsconfig
 
-`shot-rules` also ships a `tsconfig/shot-rules.json` you can extend to get the same strict compiler options ShotScript enforces:
+Ships a `tsconfig/shot-rules.json` with everything above `strict: true` — `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `verbatimModuleSyntax`, and more.
 
 ```json
-{
-  "extends": "shot-rules/tsconfig/shot-rules.json",
-  "compilerOptions": {
-    "outDir": "./dist"
-  }
-}
-```
-
-This enables everything above `strict: true`: `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `noImplicitReturns`, `verbatimModuleSyntax`, and more.
-
-## Integrating with your project
-
-### package.json script
-
-```json
-{
-  "scripts": {
-    "lint": "shot-rules 'src/**/*.ts'"
-  }
-}
-```
-
-### Pre-commit hook (lefthook)
-
-```yaml
-# lefthook.yml
-pre-commit:
-  commands:
-    shot-rules:
-      glob: "*.ts"
-      run: npx shot-rules {staged_files}
-```
-
-### Pre-commit hook (husky)
-
-```sh
-npx husky add .husky/pre-commit "npx shot-rules 'src/**/*.ts'"
-```
-
-### VS Code problem matcher
-
-Add to `.vscode/tasks.json`:
-```json
-{
-  "version": "2.0.0",
-  "tasks": [
-    {
-      "label": "shot-rules",
-      "type": "shell",
-      "command": "npx shot-rules 'src/**/*.ts'",
-      "problemMatcher": {
-        "owner": "shot-rules",
-        "fileLocation": ["relative", "${workspaceFolder}"],
-        "pattern": {
-          "regexp": "^(.+):(\\d+):(\\d+): \\[(.+)\\] (.+)$",
-          "file": 1,
-          "line": 2,
-          "column": 3,
-          "code": 4,
-          "message": 5
-        }
-      },
-      "group": "build"
-    }
-  ]
-}
-```
-
-### Neovim (null-ls / none-ls)
-
-```lua
-local null_ls = require("null-ls")
-null_ls.setup({
-  sources = {
-    null_ls.builtins.diagnostics.shot_rules.with({
-      command = "shot-rules",
-      args = { "--json", "$FILENAME" },
-      on_output = require("null-ls.helpers").diagnostics.from_json({
-        attributes = { row = "line", col = "col", code = "rule", message = "message" },
-        severities = { default = null_ls.methods.DIAGNOSTICS.WARN },
-      }),
-    }),
-  },
-})
+{ "extends": "shot-rules/tsconfig/shot-rules.json" }
 ```
 
 ## Runtime utils
 
-`shot-rules` ships a companion utility module for the globals its rules ban. Import from `shot-rules/utils`:
+The rules ban `JSON.parse`, `JSON.stringify`, and `fetch` because they throw. `shot-rules/utils` provides the safe replacements — all return `[value, null] | [null, Error]`.
 
 ```ts
 import { tryCatch, tryCatchAsync, jsonParse, jsonStringify, safeFetch } from "shot-rules/utils"
+
+// third-party calls that might throw
+const [val, err] = tryCatch(() => someLib.parse(input))
+const [val, err] = await tryCatchAsync(() => db.query(sql))
+
+// banned globals → safe wrappers
+const [data, err]  = jsonParse<Config>(text)
+const [json, err]  = jsonStringify(payload)
+const [res, err]   = await safeFetch("https://api.example.com/users/1")
 ```
 
-Every function returns `[value, null] | [null, Error]` — never throws.
-
-### `tryCatch<T>(fn: () => T): Result<T>`
-
-Wraps any synchronous call that might throw. Use this for third-party library calls.
-
+`Result<T>` is exported too — use it to type your own fallible functions:
 ```ts
-const [data, err] = tryCatch(() => someLib.parse(input))
-if (err !== null) { return [null, err] }
+import type { Result } from "shot-rules/utils"
+
+function divide(a: number, b: number): Result<number> {
+    if (b === 0) { return [null, new Error("division by zero")] }
+    return [a / b, null]
+}
 ```
-
-### `tryCatchAsync<T>(fn: () => Promise<T>): Promise<Result<T>>`
-
-Same for async calls.
-
-```ts
-const [user, err] = await tryCatchAsync(() => db.findUser(id))
-if (err !== null) { return [null, err] }
-```
-
-### `jsonParse<T>(text: string): Result<T>`
-
-Safe replacement for the banned `JSON.parse`.
-
-```ts
-const [data, err] = jsonParse<Config>(rawText)
-if (err !== null) { return [null, new Error(`invalid config: ${err.message}`)] }
-```
-
-### `jsonStringify(value: unknown, indent?: number | null): Result<string>`
-
-Safe replacement for the banned `JSON.stringify`.
-
-```ts
-const [json, err] = jsonStringify(payload)
-if (err !== null) { return [null, err] }
-```
-
-### `safeFetch(url: string | URL, init?: RequestInit | null): Promise<Result<Response>>`
-
-Safe replacement for the banned `fetch`. Network errors surface as `Error`. HTTP error status codes are not automatically errors — check `res.ok` yourself.
-
-```ts
-const [res, fetchErr] = await safeFetch(`https://api.example.com/users/${id}`)
-if (fetchErr !== null) { return [null, fetchErr] }
-if (!res.ok) { return [null, new Error(`HTTP ${res.status.toString()}`)] }
-const [data, parseErr] = jsonParse<User>(await res.text())
-if (parseErr !== null) { return [null, parseErr] }
-```
-
-### `Result<T>` type
-
-```ts
-type Result<T> = [T, null] | [null, Error]
-```
-
-Re-export this from your own codebase to type all your fallible functions consistently.
-
-## What's not included
-
-Two rules from ShotScript are intentionally omitted from `shot-rules` as they are Shot-ecosystem specific:
-
-- **`imports-allowlist`** — ShotScript restricts imports to `shot:*` and `jsr:@shotscript/*`. This is not portable; use your bundler or a custom lint rule for import restrictions in your project.
-- **Deno-specific globals** in `no-throwing-globals` — `Deno.readTextFile` / `Deno.writeTextFile` bans are omitted. The rule still covers `JSON.parse`, `JSON.stringify`, and `fetch`.
 
 ## Examples
 
-Working example projects are in [`examples/`](./examples/):
+Working projects in [`examples/`](./examples/):
 
-| Example | What it shows |
+| | |
 |---|---|
-| [`hello-world`](./examples/hello-world/) | Minimal setup — lint script, tsconfig extension |
-| [`fetch-user`](./examples/fetch-user/) | Async error handling with `safeFetch` + `jsonParse` |
-| [`calculator`](./examples/calculator/) | Fallible functions returning `Result<T>` tuples |
+| [`hello-world`](./examples/hello-world/) | Minimal setup |
+| [`fetch-user`](./examples/fetch-user/) | `safeFetch` + `jsonParse` error chain |
+| [`calculator`](./examples/calculator/) | `Result<T>` tuple returns |
 
-Each example has its own `package.json` (with `shot-rules` as a dev dep) and a `tsconfig.json` extending `shot-rules/tsconfig/shot-rules.json`.
+## Ecosystem
+
+```mermaid
+graph TD
+    SR["shot-rules\n────────────────\n• 90+ AST rules\n• Runtime utils\n• npm · any project"]
+
+    SS["shot\n────────────────\n• .shot file extension\n• Deno runtime + CLI\n• shot:std library\n• locked tsconfig"]
+
+    PROJ["Your TypeScript project\n(any runtime, any framework)"]
+
+    SR -->|"git submodule"| SS
+    SS -->|"checker"| SR
+    SR -->|"npx shot-rules"| PROJ
+```
+
+**shot-rules** — discipline on your terms, in your project.  
+**[shot](https://github.com/didley/EspressoScript)** — the full opinionated toolchain built on top of it.
 
 ## Development
 
 ```sh
 git clone https://github.com/didley/shot-rules
-cd shot-rules
-npm install
-npm run build
-npm test
+cd shot-rules && npm install
+npm run build && npm test
 ```
 
 ## License
