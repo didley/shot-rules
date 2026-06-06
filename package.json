@@ -1,0 +1,35 @@
+{
+  "name": "shot-rules",
+  "version": "0.1.0",
+  "description": "Opinionated TypeScript linting rules extracted from ShotScript — apply Go-style discipline to any TypeScript project.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/didley/shot-rules"
+  },
+  "bin": {
+    "shot-rules": "./dist/cli.js"
+  },
+  "main": "./dist/checker/mod.js",
+  "types": "./dist/checker/mod.d.ts",
+  "files": [
+    "dist/",
+    "tsconfig/"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "node --import tsx/esm tests/runner.ts",
+    "check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "glob": "^11.0.0",
+    "typescript": "^5.8.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
